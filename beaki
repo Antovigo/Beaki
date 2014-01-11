@@ -1,0 +1,77 @@
+#!/usr/bin/python3
+#-*- coding:utf-8 -*-
+import re
+import shutil
+import os
+import sys
+
+os.system('rm source.tex')
+fn = sys.argv[1]
+text = open(fn).read() + '\n'
+source = str()
+
+# préambule
+source += '\input{preamble.tex}\n\n'
+
+# titre
+md = text.split('\n',4)
+
+source += r'\title{'+md[0]+'}\n'
+source += r'\author{'+md[1]+'}\n'
+source += r'\institute{'+md[2]+'}\n'
+source += r'\date{'+md[3]+'}\n\n'
+
+# début du document
+source += '\\begin{document}\n\n'
+source += '\maketitle\n\n'
+
+# Traitement par quelques expressions
+text = re.sub('\[(.*)\]',r'\\gr{\1}',text)
+text = text.replace('%','\%')
+text = text.replace(r'\\','\\vspace{0.4cm}\n')
+
+# Ajout des diapos successives
+ini = 0
+while ini != -1:
+	debut_titre = text.find('==', ini) + 2
+	fin_titre = text.find('==',debut_titre)
+	debut_contenu = fin_titre + 3
+	fin_contenu = text.find('==',debut_contenu)
+	
+	titre = text [debut_titre : fin_titre]
+	contenu = text [debut_contenu : fin_contenu]
+	
+	# Traitement des listes
+	if contenu.find('\n*') != -1 :
+		contenu = contenu + '\n\n'
+		contenu = re.sub('\n(?!(\*|$|\n))',r'\n\n',contenu)
+		contenu = re.sub('\n\*',r'\n\\item ',contenu)
+		contenu = re.sub('\*',r'\n\\item ',contenu)
+		deb = re.search(r'\item',contenu).start() - 1
+		fin = re.search('\n\n(?!(\item))',contenu[deb:]).start() + deb
+		
+		contenu = contenu [:deb] + '\\begin{itemize}\n' + contenu [deb:fin] + '\n\end{itemize}' + contenu [fin:]
+	
+	if titre != '':
+		source += '\\begin{frame}{'+titre+'}\n\n'
+	else:
+		source += '\\begin{frame}\n\n'
+
+	source += contenu+'\\end{frame}\n\n'
+	
+	ini = fin_contenu
+
+# Fermeture du document
+source += '\end{document}'
+
+# Création du diaporama
+f = open('source.tex','a')
+f.write(source)
+f.close()
+
+shutil.copy(os.environ['HOME']+'/.beaki/preamble.tex','preamble.tex')
+
+#os.chdir('atelier')
+#print(source)
+os.system('pdflatex source.tex')
+shutil.move('source.pdf',fn+'.pdf')
