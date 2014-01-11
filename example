@@ -21,4 +21,4 @@ You can [highlight] the important words.\\
 Use a double backslash to set a space between two paragraphs.
 
 ==LaTeX==
-In most cases the LaTeX syntax will \textit{will work}.
+In most cases the LaTeX syntax \textit{will work}.
