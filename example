@@ -1,0 +1,24 @@
+Title of the presentation
+Your name
+Your institute or university
+Date of the presentation
+
+====
+This is a frame without a title.
+
+==Title==
+This is a frame with a title.
+
+====
+Use stars to make lists :
+* Item
+* Item
+* Item
+* Item
+
+====
+You can [highlight] the important words.\\
+Use a double backslash to set a space between two paragraphs.
+
+==LaTeX==
+In most cases the LaTeX syntax will \textit{will work}.
